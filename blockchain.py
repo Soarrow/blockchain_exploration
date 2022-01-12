@@ -1,6 +1,8 @@
 import hashlib
 import json
+
 from time import time
+from uuid import uuid4
 
 class Blockchain(object):
     # Responsible for managing the chain
@@ -27,7 +29,7 @@ class Blockchain(object):
             'timestamp' : time(),
             'transactions' : self.current_transactions,
             'proof' : proof,
-            'previous_hash' : previous_hash or self.hash(self.chain(-1))
+            'previous_hash' : previous_hash or self.hash(self.chain[-1])
         }
 
         # Reset the current list of transactions
@@ -71,3 +73,35 @@ class Blockchain(object):
     def last_block(self):
         # Returns the last Block in the chain
         return self.chain[-1]
+
+    def proof_of_work(self, last_block):
+        # Proof of Work Algo
+        # Find a number p where hash(pp') contains 4 leadin 0s
+        # p is the previous proof, and p' is the new p
+        # :param last_proof: <int>
+        # :return: <int>
+
+        proof = 0
+        while self.valid_proof(last_proof, proof) is False:
+            proof += 1
+        
+        return proof
+
+    @staticmethod
+    def valid_proof(last_proof, proof):
+        # Validates the Proof: Does hash(last_proof, proof) contain 4 leading 0s?
+        # :param last_proof: <int> Previous Proof
+        # :return: <bool> True if correct, False if not.
+
+        guess = f'{last_proof}{proof}'.encode()
+        guess_hash = hashlib.sha256(guess).hexdigest()
+        return guess_hash[:4] == "0000"
+
+    # ===========================================
+    # PERSONAL NOTES
+    # - Proof of Work : how new blocks are created/mined on the blockchain
+    #       - We want to find a number that solves a problem
+    #       - The number should be hard to find but easy to verify by anyone on the network
+    #       - Example: hash of two factors must end in a 0 (fix x = 0) ... 
+    #       - In BC PoW algo is known as Hashcash ... algo that miners race to solve in order to create a new block
+    #         Miners are rewarded for their solution by receiving a coin - in a transaction
