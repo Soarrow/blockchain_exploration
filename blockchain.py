@@ -1,8 +1,11 @@
 import hashlib
 import json
 
+from textwrap import dedent
 from time import time
 from uuid import uuid4
+
+from flask import Flask
 
 class Blockchain(object):
     # Responsible for managing the chain
@@ -74,7 +77,7 @@ class Blockchain(object):
         # Returns the last Block in the chain
         return self.chain[-1]
 
-    def proof_of_work(self, last_block):
+    def proof_of_work(self, last_proof):
         # Proof of Work Algo
         # Find a number p where hash(pp') contains 4 leadin 0s
         # p is the previous proof, and p' is the new p
@@ -96,6 +99,44 @@ class Blockchain(object):
         guess = f'{last_proof}{proof}'.encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
         return guess_hash[:4] == "0000"
+
+# ===============================
+# PART 2: Blockchain as an API
+# Using flask we can talk to our blockchain ovver the web using HTTP requests
+# Create three methods
+#   /transactions/new -> create a new transaction to a block
+#   /mine -> tell the server to mine a new block
+#   /chain to return the full Blockchain
+
+# The server will form a single node in the blockchian network
+
+# Instantiate our Node
+app = Flask(__name__)
+
+# Create a globally unique address for this node
+node_identifier = str(uuid4()).replace('-', '')
+
+# Instantiate the blockchain
+blockchain = Blockchain()
+
+@app.route('/mine', methods=['GET'])
+def mine():
+    return "We'll make a new Block"
+
+@app.route('/transactions/new', methods=['POST'])
+def new_transactions():
+    return "We'll add a new transaction"
+
+@app.route('/chain', methods=['GET'])
+def full_chain():
+    response = {
+        'chain' : blockchain.chain,
+        'length' : len(blockchain.chain),
+    }
+    return jsonify(response), 200
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
 
     # ===========================================
     # PERSONAL NOTES
