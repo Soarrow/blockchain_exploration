@@ -120,10 +120,37 @@ node_identifier = str(uuid4()).replace('-', '')  #creates a random name for our 
 # Instantiate the blockchain (instantiate the blockchain class)
 blockchain = Blockchain()
 
-# create the /mine endpoint (get request)
+
 @app.route('/mine', methods=['GET'])
 def mine():
-    return "We'll make a new Block"
+    # create the /mine endpoint (get request) MINING ENDPOINT
+    # Calculate PoW
+    # Reward miner by adding a transaction granting us 1 coin
+    # Forge the new Block by adding it to the chain
+
+    #run PoW to get the new proof
+    last_block = blockchain.last_block
+    last_proof = last_block['proof']
+    proof = blockchain.proof_of_work(last_proof)
+
+    # Reward miner for finding the proof
+    # Sender is 0 to show that this node has mined a new coin
+
+    blockchain.new_transaction(sender = '0', recipient = node_identifier, amount = 1)
+
+    # Create new block
+    previous_hash = blockchain.hash(last_block)
+    block = blockchain.new_block(proof, previous_hash)
+
+    response = {
+        'message' : 'New Block Forged',
+        'index' : block['index'],
+        'transactions' : block['transactions'],
+        'proof' : block['proof'],
+        'previous_hash' : block['previous_hash'],
+    }
+
+    return jsonify(response), 200
 
 # create the /transactions/new endpoint (post request ... sending data to it)
 @app.route('/transactions/new', methods=['POST'])
