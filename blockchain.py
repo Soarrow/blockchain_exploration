@@ -5,7 +5,7 @@ from textwrap import dedent
 from time import time
 from uuid import uuid4
 
-from flask import Flask
+from flask import Flask, jsonify, request
 
 class Blockchain(object):
     # Responsible for managing the chain
@@ -114,19 +114,22 @@ class Blockchain(object):
 app = Flask(__name__)
 
 # Create a globally unique address for this node
-node_identifier = str(uuid4()).replace('-', '')
+node_identifier = str(uuid4()).replace('-', '')  #creates a random name for our node
 
-# Instantiate the blockchain
+# Instantiate the blockchain (instantiate the blockchain class)
 blockchain = Blockchain()
 
+# create the /mine endpoint (get request)
 @app.route('/mine', methods=['GET'])
 def mine():
     return "We'll make a new Block"
 
+# create the /transactions/new endpoint (post request ... sending data to it)
 @app.route('/transactions/new', methods=['POST'])
 def new_transactions():
     return "We'll add a new transaction"
 
+# create the /chain endpoint (returns the full blockchain)
 @app.route('/chain', methods=['GET'])
 def full_chain():
     response = {
@@ -136,7 +139,7 @@ def full_chain():
     return jsonify(response), 200
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port = 5000)
 
     # ===========================================
     # PERSONAL NOTES
