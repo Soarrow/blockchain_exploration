@@ -68,10 +68,8 @@ class Blockchain(object):
         # :return: <str>
 
         # must ensure that the dictionary is ordered, or we'll have inconsistent hashes
-        # block_string = json.dumps(block, sort_keys = True).encode()
-        # return hashlib.sha256(block_string).hexdigest()
-
-        pass
+        block_string = json.dumps(block, sort_keys = True).encode()
+        return hashlib.sha256(block_string).hexdigest()
 
     @property
     def last_block(self):
@@ -189,3 +187,5 @@ if __name__ == '__main__':
     #       - Example: hash of two factors must end in a 0 (fix x = 0) ... 
     #       - In BC PoW algo is known as Hashcash ... algo that miners race to solve in order to create a new block
     #         Miners are rewarded for their solution by receiving a coin - in a transaction
+
+    # - Hash of the block contains the proof of work for said block ... makes it hard to tamper with each block as you would need to change the PoW (i think)
