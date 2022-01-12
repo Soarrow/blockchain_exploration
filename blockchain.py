@@ -42,6 +42,7 @@ class Blockchain(object):
         return block
     
     def new_transaction(self, sender, recipient, amount):
+        # Creating transaction for the next Block
         # Adds a new transaction to the list of transcations
         # Way of adding transactions to a Block
         # Creates a new transaction to go into the next mined Block
@@ -127,7 +128,19 @@ def mine():
 # create the /transactions/new endpoint (post request ... sending data to it)
 @app.route('/transactions/new', methods=['POST'])
 def new_transactions():
-    return "We'll add a new transaction"
+    values = request.get_json()
+
+    # Check that the required fields are in the POSTed data
+    required = ['sender', 'recipient', 'amount']
+
+    if not all (k in values for k in required):
+        return 'Missing values', 400
+
+    # Create a new Transaction
+    index = blockchain.new_transaction(values['sender'], values['recipient'], values['amount'])
+
+    response = {'message': f'Transaction will be added to Block {index}'}
+    return jsonify(response), 201
 
 # create the /chain endpoint (returns the full blockchain)
 @app.route('/chain', methods=['GET'])
